@@ -1,0 +1,17 @@
+{
+  "name": "donenext",
+  "version": "1.0.0",
+  "description": "公司內部任務管理工具",
+  "main": "server.js",
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "start": "node server.js",
+    "installService": "node scripts/install-service.js",
+    "uninstallService": "node scripts/uninstall-service.js"
+  },
+  "dependencies": {
+    "node-windows": "1.0.0-beta.8"
+  }
+}
