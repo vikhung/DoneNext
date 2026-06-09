@@ -2,9 +2,10 @@
 const { execSync } = require('child_process');
 const path = require('path');
 
-// Verify Administrator privileges
+// Verify elevated token (High Mandatory Level = S-1-16-12288)
 try {
-  execSync('net session', { stdio: 'ignore' });
+  const groups = execSync('whoami /groups', { encoding: 'utf8' });
+  if (!groups.includes('S-1-16-12288')) throw new Error('not elevated');
 } catch {
   console.error('ERROR: Administrator privileges required.');
   console.error('Please right-click your terminal and select "Run as administrator".');

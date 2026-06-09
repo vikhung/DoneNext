@@ -103,6 +103,17 @@ function getAllDescendantIds(taskId) {
   return ids;
 }
 
+// ── Descendant helpers ─────────────────────────────────────
+function hasUnfinishedDescendants(taskId) {
+  const queue = [...allTodos.filter(t => t.parentId === taskId)];
+  while (queue.length) {
+    const t = queue.shift();
+    if (t.status !== '已完成') return true;
+    allTodos.filter(c => c.parentId === t.id).forEach(c => queue.push(c));
+  }
+  return false;
+}
+
 // ── Drop zone rendering ─────────────────────────────────────
 function dropZoneHtml(parentId, afterId, beforeId) {
   return `<div class="drop-zone" data-parent-id="${esc(parentId||'')}" data-after-id="${esc(afterId||'')}" data-before-id="${esc(beforeId||'')}"></div>`;
@@ -166,17 +177,16 @@ function taskHtml(task, level) {
 // ── Render todo list ───────────────────────────────────────
 function renderList() {
   const container = document.getElementById('todo-list');
-  let src = allTodos;
-  if (listFilter.assignedTo) src = src.filter(t => (t.assignedTo || '').includes(listFilter.assignedTo));
-  if (listFilter.priority)   src = src.filter(t => t.priority === listFilter.priority);
-  if (listFilter.type)       src = src.filter(t => t.type     === listFilter.type);
 
   // 子任務（含子子任務）固定以自訂排序（sortOrder）排列
-  const bySortOrder = [...src].sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0));
+  const bySortOrder = [...allTodos].sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0));
   let roots = buildTree(bySortOrder);
 
-  // 狀態篩選僅作用於根任務，子任務不受影響
-  if (listFilter.status) roots = roots.filter(t => t.status === listFilter.status);
+  // 所有過濾條件僅作用於根任務，子任務一律顯示
+  if (listFilter.status)     roots = roots.filter(t => t.status === listFilter.status);
+  if (listFilter.assignedTo) roots = roots.filter(t => (t.assignedTo || '').includes(listFilter.assignedTo));
+  if (listFilter.priority)   roots = roots.filter(t => t.priority === listFilter.priority);
+  if (listFilter.type)       roots = roots.filter(t => t.type     === listFilter.type);
 
   // 根任務依排序列設定排列
   roots = applySort(roots);
@@ -294,8 +304,14 @@ function bindDragEvents(container) {
       // 加到子任務末端：sortOrder = 現有子任務最大值 + 65536
       const children = allTodos.filter(t => t.parentId === id);
       const maxOrder = children.reduce((m, t) => Math.max(m, t.sortOrder ?? 0), 0);
+      const patch1 = { parentId: id, sortOrder: maxOrder + 65536 };
+      const srcTask1 = allTodos.find(t => t.id === srcId);
+      if (srcTask1 && !srcTask1.parentId) {
+        const newParent1 = allTodos.find(t => t.id === id);
+        if (newParent1) { patch1.priority = newParent1.priority; patch1.type = newParent1.type; }
+      }
       try {
-        await api('PUT', `/api/todos/${srcId}`, { parentId: id, sortOrder: maxOrder + 65536 });
+        await api('PUT', `/api/todos/${srcId}`, patch1);
         await loadTodos();
       } catch (err) { alert('移動失敗：' + err.message); }
     });
@@ -343,8 +359,14 @@ function bindDragEvents(container) {
       else if (nextOrder !== null)                  newSortOrder = nextOrder  - 65536;
       else                                          newSortOrder = Date.now();
 
+      const patch2 = { parentId: newParentId, sortOrder: newSortOrder };
+      const srcTask2 = allTodos.find(t => t.id === srcId);
+      if (srcTask2 && !srcTask2.parentId && newParentId) {
+        const newParent2 = allTodos.find(t => t.id === newParentId);
+        if (newParent2) { patch2.priority = newParent2.priority; patch2.type = newParent2.type; }
+      }
       try {
-        await api('PUT', `/api/todos/${srcId}`, { parentId: newParentId, sortOrder: newSortOrder });
+        await api('PUT', `/api/todos/${srcId}`, patch2);
         await loadTodos();
       } catch (err) { alert('移動失敗：' + err.message); }
     });
@@ -520,6 +542,14 @@ function openModal(todo, parentTask) {
     document.getElementById('f-type').value               = '專案需求';
   }
 
+  // Reset and conditionally disable 已完成 for root tasks with unfinished children
+  const statusSel = document.getElementById('f-status');
+  statusSel.querySelectorAll('option').forEach(o => { o.disabled = false; });
+  if (todo && !todo.parentId && todo.status !== '已完成' && hasUnfinishedDescendants(todo.id)) {
+    const doneOpt = statusSel.querySelector('option[value="已完成"]');
+    if (doneOpt) doneOpt.disabled = true;
+  }
+
   modal.classList.remove('hidden');
   setTimeout(() => document.getElementById('f-task').focus(), 50);
 }
@@ -554,6 +584,15 @@ document.getElementById('todo-form').addEventListener('submit', async e => {
     description:  document.getElementById('f-description').value.trim(),
   };
   if (parentId) payload.parentId = parentId;
+
+  // Block setting root task to 已完成 when descendants are unfinished
+  if (!parentId && id && payload.status === '已完成') {
+    const original = allTodos.find(t => t.id === id);
+    if (original && original.status !== '已完成' && hasUnfinishedDescendants(id)) {
+      alert('尚有未完成的子任務，無法設為「已完成」');
+      return;
+    }
+  }
 
   try {
     if (id) await api('PUT',  `/api/todos/${id}`, payload);
@@ -644,12 +683,16 @@ document.querySelectorAll('.tab-btn').forEach(btn => {
 
 // Toolbar
 document.getElementById('btn-add').addEventListener('click', () => openModal(null, null));
-document.getElementById('btn-filter').addEventListener('click', () => {
+
+function applyListFilter() {
   listFilter.assignedTo = document.getElementById('filter-assignedTo').value;
   listFilter.status     = document.getElementById('filter-status').value;
   listFilter.priority   = document.getElementById('filter-priority').value;
   listFilter.type       = document.getElementById('filter-type').value;
   renderList();
+}
+['filter-assignedTo', 'filter-status', 'filter-priority', 'filter-type'].forEach(id => {
+  document.getElementById(id).addEventListener('change', applyListFilter);
 });
 
 // Sort bar

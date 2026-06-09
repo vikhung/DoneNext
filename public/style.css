@@ -15,7 +15,7 @@ header {
   padding: 14px 24px;
   box-shadow: 0 2px 6px rgba(0,0,0,.25);
 }
-header h1 { font-size: 1.25rem; font-weight: 600; }
+header h1 { font-size: 1.25rem; font-weight: 600; display: flex; align-items: center; gap: 10px; }
 
 /* ── Container ── */
 .container { max-width: 1100px; margin: 24px auto; padding: 0 16px; }
@@ -484,6 +484,93 @@ header h1 { font-size: 1.25rem; font-weight: 600; }
   background: #2563eb;
 }
 
+/* ── Help page ── */
+.help-page {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+.help-section {
+  background: #fff;
+  border-radius: 8px;
+  padding: 20px 24px;
+  box-shadow: 0 1px 3px rgba(0,0,0,.07);
+}
+.help-section-full { grid-column: 1 / -1; }
+.help-section h3 {
+  font-size: .95rem;
+  font-weight: 600;
+  color: #0f172a;
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 2px solid #e2e8f0;
+}
+.help-section ul {
+  padding-left: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+.help-section li {
+  font-size: .85rem;
+  color: #334155;
+  line-height: 1.55;
+}
+.help-section li strong { color: #1e3a8a; }
+
+/* ── Changelog page ── */
+.changelog-page {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  max-width: 760px;
+}
+.version-block {
+  background: #fff;
+  border-radius: 8px;
+  padding: 20px 24px;
+  box-shadow: 0 1px 3px rgba(0,0,0,.07);
+}
+.version-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #e2e8f0;
+}
+.version-badge {
+  background: #1e3a8a;
+  color: #fff;
+  font-size: .8rem;
+  font-weight: 700;
+  padding: 3px 12px;
+  border-radius: 20px;
+}
+.version-badge-old { background: #64748b; }
+.version-date { font-size: .82rem; color: #94a3b8; }
+.version-label { font-size: .82rem; color: #475569; font-weight: 500; }
+.changelog-list { display: flex; flex-direction: column; gap: 10px; }
+.changelog-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-size: .85rem;
+  color: #334155;
+  line-height: 1.55;
+}
+.changelog-tag {
+  flex-shrink: 0;
+  font-size: .72rem;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 10px;
+  margin-top: 1px;
+}
+.tag-new     { background: #dcfce7; color: #15803d; }
+.tag-improve { background: #dbeafe; color: #1d4ed8; }
+.tag-fix     { background: #fef3c7; color: #92400e; }
+
 /* ── Responsive ── */
 @media (max-width: 640px) {
   .filter-row { margin-left: 0; }
@@ -491,4 +578,6 @@ header h1 { font-size: 1.25rem; font-weight: 600; }
   .form-row-2col { grid-template-columns: 1fr; }
   .modal-content { padding: 20px 18px; }
   .search-grid { grid-template-columns: 1fr; }
+  .help-page { grid-template-columns: 1fr; }
+  .help-section-full { grid-column: 1; }
 }

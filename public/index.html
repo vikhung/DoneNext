@@ -3,13 +3,14 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>公司內部任務管理</title>
+  <title>任務管理平台</title>
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
 <header>
-  <h1>公司內部任務管理</h1>
+  <h1><img src="favicon.svg" alt="" width="24" height="24">任務管理平台</h1>
 </header>
 
 <div class="container">
@@ -17,6 +18,8 @@
     <button class="tab-btn active" data-tab="list">任務列表</button>
     <button class="tab-btn" data-tab="search">查詢歷史</button>
     <button class="tab-btn" data-tab="manage">管理作業</button>
+    <button class="tab-btn" data-tab="help">使用說明</button>
+    <button class="tab-btn" data-tab="changelog">異動說明</button>
   </div>
 
   <!-- 任務列表 -->
@@ -43,7 +46,6 @@
         <select id="filter-type">
           <option value="">全部</option>
         </select>
-        <button class="btn btn-secondary" id="btn-filter">套用</button>
       </div>
     </div>
 
@@ -139,6 +141,177 @@
       </div>
     </div>
   </div>
+
+  <!-- 使用說明 -->
+  <div id="tab-help" class="tab-content">
+    <div class="help-page">
+
+      <div class="help-section">
+        <h3>任務基本操作</h3>
+        <ul>
+          <li><strong>新增任務</strong>：點擊左上角「+ 新增任務」，填寫表單後按「儲存」</li>
+          <li><strong>編輯任務</strong>：點擊任務列右側的「編輯」按鈕</li>
+          <li><strong>刪除任務</strong>：點擊「刪除」，含所有子任務一併刪除，需確認</li>
+          <li><strong>複製任務</strong>：點擊「複製」，含所有子任務深度複製並加到列表末端</li>
+        </ul>
+      </div>
+
+      <div class="help-section">
+        <h3>任務欄位說明</h3>
+        <ul>
+          <li><strong>任務項目</strong>（必填）：任務名稱</li>
+          <li><strong>負責人</strong>：可從「管理作業」維護的人員清單選取</li>
+          <li><strong>辦理狀態</strong>：進行中 / 已完成</li>
+          <li><strong>優先序</strong>：高 / 中 / 低，僅最上層任務顯示</li>
+          <li><strong>項目類型</strong>：可自訂，僅最上層任務顯示</li>
+          <li><strong>預計開始 / 完成日期</strong>：選填，可用於排序與查詢</li>
+          <li><strong>任務說明</strong>：補充說明，滑鼠移至標題列可預覽全文</li>
+        </ul>
+      </div>
+
+      <div class="help-section">
+        <h3>子任務</h3>
+        <ul>
+          <li>點擊任務列的「子任務」按鈕，可在該任務下新增子任務</li>
+          <li>子任務支援無限層巢狀，點擊 ▶ / ▼ 可展開或收合</li>
+          <li>子任務不顯示優先序與項目類型</li>
+          <li>最上層任務若有任何子任務<strong>尚未完成</strong>，無法設為「已完成」</li>
+        </ul>
+      </div>
+
+      <div class="help-section">
+        <h3>拖曳排序與搬移</h3>
+        <ul>
+          <li>拖曳每列最左側的 <strong>⠿</strong> 手柄可移動任務</li>
+          <li><strong>拖到兩列間的空隙</strong>：調整排列位置（可跨層級）</li>
+          <li><strong>拖到任務主體上</strong>：使其成為該任務的子任務</li>
+          <li>根任務被拖入子任務時，自動繼承父任務的優先序與項目類型</li>
+          <li>子任務被拉出為獨立根任務時，沿用原先繼承的欄位值</li>
+        </ul>
+      </div>
+
+      <div class="help-section">
+        <h3>過濾與排序</h3>
+        <ul>
+          <li>上方過濾列提供：負責人、狀態、優先序、項目類型，<strong>選單變更即時生效</strong></li>
+          <li>過濾條件<strong>僅作用於最上層任務</strong>，子任務不受影響一律顯示</li>
+          <li>排序列提供：新增時間、負責人、辦理狀態、預計開始、預計完成</li>
+          <li>點擊已啟用的排序按鈕可切換升 / 降冪，再次點擊回到手動排序</li>
+          <li>手動排序為拖曳後儲存的自訂順序，子任務一律以手動排序呈現</li>
+        </ul>
+      </div>
+
+      <div class="help-section">
+        <h3>查詢歷史</h3>
+        <ul>
+          <li>支援跨所有任務（含子任務）的多欄位組合查詢</li>
+          <li>任務名稱為<strong>模糊搜尋</strong>，其他欄位為精確比對</li>
+          <li>日期欄位支援區間查詢（起始日期 ～ 結束日期）</li>
+          <li>查詢結果可直接點擊「編輯」開啟對應任務</li>
+        </ul>
+      </div>
+
+      <div class="help-section help-section-full">
+        <h3>管理作業</h3>
+        <ul>
+          <li><strong>負責人管理</strong>：新增或移除人員，供新增任務時選取（支援 Enter 快速新增）</li>
+          <li><strong>項目類型管理</strong>：新增或移除類型，預設包含「專案需求、系統維運、注意事項」</li>
+        </ul>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- 異動說明 -->
+  <div id="tab-changelog" class="tab-content">
+    <div class="changelog-page">
+
+      <div class="version-block">
+        <div class="version-header">
+          <span class="version-badge">V0.2</span>
+          <span class="version-date">2026-06-09</span>
+          <span class="version-label">功能優化</span>
+        </div>
+        <div class="changelog-list">
+          <div class="changelog-item">
+            <span class="changelog-tag tag-improve">優化</span>
+            <span>平台標題更名為「任務管理平台」，並加入品牌 icon（瀏覽器分頁與頁面標題同步顯示）</span>
+          </div>
+          <div class="changelog-item">
+            <span class="changelog-tag tag-improve">優化</span>
+            <span>上排過濾條件改為即時生效，選單變更後無須再按「套用」按鈕</span>
+          </div>
+          <div class="changelog-item">
+            <span class="changelog-tag tag-new">新功能</span>
+            <span>最上層任務若有未完成的子任務，「已完成」狀態選項自動禁用，防止誤操作</span>
+          </div>
+          <div class="changelog-item">
+            <span class="changelog-tag tag-new">新功能</span>
+            <span>根任務拖入子任務時，自動繼承父任務的優先序與項目類型，確保過濾器可正確篩選</span>
+          </div>
+          <div class="changelog-item">
+            <span class="changelog-tag tag-fix">修正</span>
+            <span>負責人、優先序、項目類型過濾器改為僅篩選最上層任務（與狀態過濾器行為一致），子任務一律顯示</span>
+          </div>
+          <div class="changelog-item">
+            <span class="changelog-tag tag-new">新功能</span>
+            <span>新增「使用說明」與「異動說明」頁籤</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="version-block">
+        <div class="version-header">
+          <span class="version-badge version-badge-old">V0.1</span>
+          <span class="version-date">初始版本</span>
+        </div>
+        <div class="changelog-list">
+          <div class="changelog-item">
+            <span class="changelog-tag tag-new">新功能</span>
+            <span>任務 CRUD：新增、編輯、刪除（子任務連帶刪除）、深度複製</span>
+          </div>
+          <div class="changelog-item">
+            <span class="changelog-tag tag-new">新功能</span>
+            <span>巢狀子任務：支援任意深度樹狀結構，可展開 / 收合</span>
+          </div>
+          <div class="changelog-item">
+            <span class="changelog-tag tag-new">新功能</span>
+            <span>拖曳排序：拖曳手柄可調整位置、跨層級搬移或設為子任務</span>
+          </div>
+          <div class="changelog-item">
+            <span class="changelog-tag tag-new">新功能</span>
+            <span>任務欄位：辦理狀態、優先序、項目類型、負責人、日期區間、任務說明</span>
+          </div>
+          <div class="changelog-item">
+            <span class="changelog-tag tag-new">新功能</span>
+            <span>任務列表過濾列：依負責人、狀態、優先序、項目類型篩選</span>
+          </div>
+          <div class="changelog-item">
+            <span class="changelog-tag tag-new">新功能</span>
+            <span>多欄位排序：新增時間、負責人、辦理狀態、預計開始、預計完成</span>
+          </div>
+          <div class="changelog-item">
+            <span class="changelog-tag tag-new">新功能</span>
+            <span>查詢歷史：多條件組合搜尋，支援日期區間與模糊搜尋</span>
+          </div>
+          <div class="changelog-item">
+            <span class="changelog-tag tag-new">新功能</span>
+            <span>管理作業：負責人清單與項目類型清單維護</span>
+          </div>
+          <div class="changelog-item">
+            <span class="changelog-tag tag-new">新功能</span>
+            <span>每日 log 輪替，資料以 JSON 格式存放於本機 data/ 目錄</span>
+          </div>
+          <div class="changelog-item">
+            <span class="changelog-tag tag-new">新功能</span>
+            <span>Windows 服務安裝支援（DoneNextService，開機自動啟動）</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
 </div>
 
 <!-- 新增/編輯任務 Modal -->
