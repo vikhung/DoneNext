@@ -41,6 +41,9 @@ function serveStatic(req, res) {
 const server = http.createServer(async (req, res) => {
   logger.info(`${req.method} ${req.url}`);
 
+  res.setHeader('X-Frame-Options', 'DENY');
+  res.setHeader('Content-Security-Policy', "frame-ancestors 'none'");
+
   if (req.url.startsWith('/api/')) {
     try {
       await router.handle(req, res);
