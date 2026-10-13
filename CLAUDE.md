@@ -52,17 +52,29 @@ Fields: `id` (UUID), `task`, `assignedTo`, `assignedDate`, `startDate`, `dueDate
 - `assignedDate` format: `YYYY-MM-DDTHH:MM` (date chosen by user, time auto-recorded on save).
 - `sortOrder` (number) controls manual drag-and-drop ordering. Auto-assigned on create; migrated from index-based values on first read for existing records without it.
 - `parentId` enables an arbitrary-depth task tree. Deleting a parent cascades to all descendants (BFS loop in `todoStore.remove`).
-- Valid statuses: `首次`, `進行中`, `已完成`, `暫停`, `取消`
+- Valid statuses: `進行中`, `已完成`
 - Valid priorities: `高`, `中`, `低`
 - `id` and `createdAt` are immutable after creation; `update()` strips them from patches.
-- New root tasks get `sortOrder = minExisting - 65536` (appear at top); new subtasks get `maxSiblings + 65536` (appear at bottom).
+- New root tasks get `sortOrder = minExisting - 65536` (appear at top); new subtasks get `sortOrder = minSiblingOrder - 65536` (also appear at top, within their parent).
+- When a subtask's (any non-root task's) `status` is updated to `已完成` from a different prior status, `todoStore.update` auto-recalculates its `sortOrder` to `maxSiblingOrder + 65536`, moving it to the bottom of its parent's children — unless the caller explicitly supplies `sortOrder` in the same patch (e.g. drag-and-drop reordering).
 
 ### Frontend
 
-Vanilla JS in `public/app.js` — no framework, no bundler. Three tabs:
-- **任務列表**: task list with filter/sort bar and drag-and-drop reordering
-- **查詢歷史**: multi-field search across all tasks
-- **管理作業**: user list management and type list management
+Vanilla JS, no framework, no bundler — plain `<script>` tags sharing one global scope. Two-tier tab navigation in `public/index.html`:
+
+- **Top-level tabs** (`.top-tabs` / `.top-tab-btn` buttons, each toggling a sibling `.top-section`): **任務管理**, **常用工具**, **異動說明**. Adding another top-level feature only requires a new button + `.top-section` in HTML — no JS changes needed.
+- **任務管理** (`public/app.js`) wraps the original task-management UI, itself a second tier of sub-tabs (`.tabs` / `.tab-btn` / `.tab-content`, same visual pattern reused one level down):
+  - **任務列表**: task list with filter/sort bar and drag-and-drop reordering
+  - **查詢歷史**: multi-field search across all tasks
+  - **管理作業**: user list management and type list management
+  - **使用說明**: static help page
+- **常用工具** (`public/toolkit.js`, loaded after `app.js`) is its own sub-tab group with the same `.tabs`/`.tab-content` pattern:
+  - **JSON Viewer**: paste JSON, live-parsed (debounced) into a collapsible tree (`#json-tree`) with `+`/`−` expand/collapse toggles; invalid JSON shows an inline error under the textarea instead of `alert()`.
+  - **Base64 編解碼**: button-triggered encode/decode between plain text and Base64, using `TextEncoder`/`TextDecoder` (not raw `btoa`/`atob`) so multi-byte UTF-8 text (e.g. Chinese) round-trips correctly.
+  - Toolkit code has no dependency on todo state; it reuses the global `esc()` defined in `app.js` for XSS-safe rendering.
+- **異動說明** (`#top-changelog`) is a static, single-view top-level section (no internal sub-tabs) listing version history.
+
+Tab-switching logic lives in `app.js`: one handler for `.top-tab-btn` (toggles `.top-section`), and one for `.tab-btn` that scopes its query to `btn.closest('.top-section')` — this keeps the 任務管理 sub-tabs and 常用工具 sub-tabs as independent groups so switching one doesn't reset the other's active state.
 
 The task tree is built client-side from the flat array returned by `GET /api/todos`. All HTML is constructed via template literals with an `esc()` helper to prevent XSS.
 

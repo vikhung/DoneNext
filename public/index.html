@@ -3,23 +3,29 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>任務管理平台</title>
+  <title>工作管理平台</title>
   <link rel="icon" href="favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
 <header>
-  <h1><img src="favicon.svg" alt="" width="24" height="24">任務管理平台</h1>
+  <h1><img src="favicon.svg" alt="" width="24" height="24">工作管理平台</h1>
 </header>
 
+<nav class="top-tabs">
+  <button class="top-tab-btn active" data-top="todo">任務管理</button>
+  <button class="top-tab-btn" data-top="toolkit">常用工具</button>
+  <button class="top-tab-btn" data-top="changelog">異動說明</button>
+</nav>
+
 <div class="container">
+  <div id="top-todo" class="top-section active">
   <div class="tabs">
     <button class="tab-btn active" data-tab="list">任務列表</button>
     <button class="tab-btn" data-tab="search">查詢歷史</button>
     <button class="tab-btn" data-tab="manage">管理作業</button>
     <button class="tab-btn" data-tab="help">使用說明</button>
-    <button class="tab-btn" data-tab="changelog">異動說明</button>
   </div>
 
   <!-- 任務列表 -->
@@ -175,6 +181,8 @@
           <li>點擊任務列的「子任務」按鈕，可在該任務下新增子任務</li>
           <li>子任務支援無限層巢狀，點擊 ▶ / ▼ 可展開或收合</li>
           <li>子任務不顯示優先序與項目類型</li>
+          <li><strong>新增子任務</strong>時，預設排在同層子任務的<strong>最上方</strong></li>
+          <li>子任務的辦理狀態變更為「已完成」時，會自動移動到同層子任務的<strong>最下方</strong></li>
           <li>最上層任務若有任何子任務<strong>尚未完成</strong>，無法設為「已完成」</li>
         </ul>
       </div>
@@ -221,14 +229,106 @@
 
     </div>
   </div>
+  </div>
 
-  <!-- 異動說明 -->
-  <div id="tab-changelog" class="tab-content">
+  <div id="top-toolkit" class="top-section">
+  <div class="tabs">
+    <button class="tab-btn active" data-tab="json">JSON Viewer</button>
+    <button class="tab-btn" data-tab="base64">Base64 編解碼</button>
+  </div>
+
+  <!-- JSON Viewer -->
+  <div id="tab-json" class="tab-content active">
+    <div class="tool-panel">
+      <div class="tool-input-row">
+        <label for="json-input">貼上 JSON 內容</label>
+        <textarea id="json-input" rows="8" spellcheck="false" placeholder='貼上 JSON，例如：{"name":"測試","list":[1,2,3]}'></textarea>
+      </div>
+      <div id="json-error" class="tool-error hidden"></div>
+      <div class="tool-input-row">
+        <label>樹狀檢視</label>
+        <div id="json-tree" class="json-tree">
+          <div class="empty-state">貼上 JSON 內容以檢視樹狀結構</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Base64 編解碼 -->
+  <div id="tab-base64" class="tab-content">
+    <div class="tool-panel">
+      <div class="b64-grid">
+        <div class="tool-input-row">
+          <label for="b64-plain">文字（明文）</label>
+          <textarea id="b64-plain" rows="8" spellcheck="false" placeholder="輸入文字…"></textarea>
+        </div>
+        <div class="tool-input-row">
+          <label for="b64-encoded">Base64</label>
+          <textarea id="b64-encoded" rows="8" spellcheck="false" placeholder="輸入 Base64 字串…"></textarea>
+        </div>
+      </div>
+      <div class="tool-actions">
+        <button class="btn btn-primary" id="btn-b64-encode">→ 編碼為 Base64</button>
+        <button class="btn btn-primary" id="btn-b64-decode">← 解碼為文字</button>
+        <button class="btn btn-secondary" id="btn-b64-clear">清除</button>
+      </div>
+      <div id="b64-error" class="tool-error hidden"></div>
+    </div>
+  </div>
+  </div>
+
+  <div id="top-changelog" class="top-section">
     <div class="changelog-page">
 
       <div class="version-block">
         <div class="version-header">
-          <span class="version-badge">V0.2</span>
+          <span class="version-badge">V0.3</span>
+          <span class="version-date">2026-08-28</span>
+          <span class="version-label">新功能與行為優化</span>
+        </div>
+        <div class="changelog-list">
+          <div class="changelog-item">
+            <span class="changelog-tag tag-new">新功能</span>
+            <span>新增頂層頁籤「常用工具」，與「任務管理」並列，未來可持續擴充新工具</span>
+          </div>
+          <div class="changelog-item">
+            <span class="changelog-tag tag-new">新功能</span>
+            <span>常用工具新增「JSON Viewer」：貼上 JSON 內容即時解析為樹狀結構，可用 +／− 符號展開或收合節點</span>
+          </div>
+          <div class="changelog-item">
+            <span class="changelog-tag tag-new">新功能</span>
+            <span>常用工具新增「Base64 編解碼」：文字與 Base64 字串互轉，正確處理中文等多位元組字元</span>
+          </div>
+          <div class="changelog-item">
+            <span class="changelog-tag tag-improve">優化</span>
+            <span>新增子任務時，預設排在同層子任務的最上方</span>
+          </div>
+          <div class="changelog-item">
+            <span class="changelog-tag tag-improve">優化</span>
+            <span>子任務狀態變更為「已完成」時，自動移動到同層子任務的最下方</span>
+          </div>
+          <div class="changelog-item">
+            <span class="changelog-tag tag-improve">優化</span>
+            <span>「異動說明」由任務管理的子頁籤，提升為頂層頁籤，與「任務管理」「常用工具」並列</span>
+          </div>
+          <div class="changelog-item">
+            <span class="changelog-tag tag-improve">優化</span>
+            <span>平台名稱更名為「工作管理平台」</span>
+          </div>
+          <div class="changelog-item">
+            <span class="changelog-tag tag-improve">優化</span>
+            <span>「瑞士刀工具組」頁籤更名為「常用工具」</span>
+          </div>
+          <div class="changelog-item">
+            <span class="changelog-tag tag-improve">優化</span>
+            <span>使用說明頁籤補充「新增子任務」與「子任務完成」的預設排序規則說明</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="version-block">
+        <div class="version-header">
+          <span class="version-badge version-badge-old">V0.2</span>
           <span class="version-date">2026-06-09</span>
           <span class="version-label">功能優化</span>
         </div>
@@ -390,5 +490,6 @@
 </div>
 
 <script src="app.js"></script>
+<script src="toolkit.js"></script>
 </body>
 </html>
