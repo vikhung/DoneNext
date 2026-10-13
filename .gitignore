@@ -86,6 +86,9 @@ out
 dist
 .output
 
+# npm run deploy 產生的部署封存檔
+dist_*.rar
+
 # Gatsby files
 .cache/
 # Comment in the public line in if your project uses Gatsby and not Next.js

@@ -670,13 +670,24 @@ async function doSearch() {
 
 // ── Wire-up events ─────────────────────────────────────────
 
-// Tabs
+// Top-level tabs（任務管理 / 常用工具 / 異動說明 / 未來新功能）
+document.querySelectorAll('.top-tab-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.top-tab-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.top-section').forEach(s => s.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById(`top-${btn.dataset.top}`).classList.add('active');
+  });
+});
+
+// Sub-level tabs — 限定在所屬 .top-section 範圍內切換，避免多組頁籤互相干擾
 document.querySelectorAll('.tab-btn').forEach(btn => {
   btn.addEventListener('click', () => {
-    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+    const scope = btn.closest('.top-section') || document;
+    scope.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    scope.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
     btn.classList.add('active');
-    document.getElementById(`tab-${btn.dataset.tab}`).classList.add('active');
+    scope.querySelector(`#tab-${btn.dataset.tab}`).classList.add('active');
     if (btn.dataset.tab === 'manage') { renderUserList(); renderTypeList(); }
   });
 });
