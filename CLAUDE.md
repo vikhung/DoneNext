@@ -65,6 +65,7 @@ Vanilla JS, no framework, no bundler — plain `<script>` tags sharing one globa
 - **Top-level tabs** (`.top-tabs` / `.top-tab-btn` buttons, each toggling a sibling `.top-section`): **任務管理**, **常用工具**, **異動說明**. Adding another top-level feature only requires a new button + `.top-section` in HTML — no JS changes needed.
 - **任務管理** (`public/app.js`) wraps the original task-management UI, itself a second tier of sub-tabs (`.tabs` / `.tab-btn` / `.tab-content`, same visual pattern reused one level down):
   - **任務列表**: task list with filter/sort bar and drag-and-drop reordering
+    - **待辦清單** (`#btn-pending` in the toolbar → `#pending-modal`, logic in `app.js`: `collectPending` / `renderPending`): modal listing leaf-level unfinished tasks (status ≠ `已完成` and no unfinished descendants), grouped by root task with a breadcrumb path, filterable by assignee, overdue `dueDate` highlighted. Computed client-side from `allTodos`; independent of `listFilter`. Its 編輯 button closes the modal and opens the task edit modal.
   - **查詢歷史**: multi-field search across all tasks
   - **管理作業**: user list management and type list management
   - **使用說明**: static help page

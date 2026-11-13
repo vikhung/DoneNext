@@ -32,6 +32,7 @@
   <div id="tab-list" class="tab-content active">
     <div class="toolbar">
       <button class="btn btn-primary" id="btn-add">+ 新增任務</button>
+      <button class="btn btn-warning" id="btn-pending">📋 待辦清單</button>
       <div class="filter-row">
         <label>負責人：</label>
         <select id="filter-assignedTo"><option value="">全部</option></select>
@@ -188,6 +189,17 @@
       </div>
 
       <div class="help-section">
+        <h3>待辦清單</h3>
+        <ul>
+          <li>點擊工具列的「📋 待辦清單」，會列出所有<strong>最下層、尚未完成</strong>的任務（底下沒有未完成子任務者）</li>
+          <li>依根任務分組，並顯示該項目所屬的上層路徑；截止日已過者以紅字標示「逾期」</li>
+          <li>可依負責人篩選；不受主畫面過濾條件影響</li>
+          <li>點擊「編輯」可直接修改該任務（例如標記為已完成）</li>
+          <li>若父任務的子任務已全數完成但父任務本身未完成，也會列出，提醒可將其標為完成</li>
+        </ul>
+      </div>
+
+      <div class="help-section">
         <h3>拖曳排序與搬移</h3>
         <ul>
           <li>拖曳每列最左側的 <strong>⠿</strong> 手柄可移動任務</li>
@@ -279,6 +291,24 @@
 
   <div id="top-changelog" class="top-section">
     <div class="changelog-page">
+
+      <div class="version-block">
+        <div class="version-header">
+          <span class="version-badge">V0.4</span>
+          <span class="version-date">2026-11-13</span>
+          <span class="version-label">待辦清單</span>
+        </div>
+        <div class="changelog-list">
+          <div class="changelog-item">
+            <span class="changelog-tag tag-new">新功能</span>
+            <span>任務列表新增「待辦清單」按鈕：一鍵列出所有最下層、尚未完成的任務，依根任務分組並顯示所屬路徑，方便快速審視</span>
+          </div>
+          <div class="changelog-item">
+            <span class="changelog-tag tag-new">新功能</span>
+            <span>待辦清單可依負責人篩選，截止日已過的項目以紅字標示「逾期」，並可直接點「編輯」修改任務</span>
+          </div>
+        </div>
+      </div>
 
       <div class="version-block">
         <div class="version-header">
@@ -412,6 +442,23 @@
     </div>
   </div>
 
+</div>
+
+<!-- 待辦清單 Modal -->
+<div id="pending-modal" class="modal hidden">
+  <div class="modal-backdrop" id="pending-backdrop"></div>
+  <div class="modal-content pending-content">
+    <h2>待辦清單 <span id="pending-count" class="pending-count"></span></h2>
+    <div class="pending-filter">
+      <label for="pending-assignee">負責人：</label>
+      <select id="pending-assignee"><option value="">全部</option></select>
+      <span class="pending-hint">僅列出尚未完成、且底下沒有未完成子任務的項目</span>
+    </div>
+    <div id="pending-list"></div>
+    <div class="form-actions">
+      <button type="button" class="btn btn-secondary" id="pending-close">關閉</button>
+    </div>
+  </div>
 </div>
 
 <!-- 新增/編輯任務 Modal -->

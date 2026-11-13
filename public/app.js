@@ -765,7 +765,86 @@ document.getElementById('new-type-name').addEventListener('keydown', e => {
 });
 
 // Escape closes task modal
-document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') { closeModal(); closePending(); }
+});
+
+// ── 待辦清單 ───────────────────────────────────────────────
+// 列出「未完成且底下沒有未完成子任務」的項目（實際待處理的末端工作），依根任務分組
+function collectPending(assignee) {
+  const sorted = [...allTodos].sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0));
+  const groups = [];
+  const walk = (node, path, group) => {
+    const open = node.children.filter(c => !isDoneDeep(c));
+    if (node.status !== '已完成' && open.length === 0) {
+      if (!assignee || node.assignedTo === assignee) group.items.push({ node, path });
+    }
+    node.children.forEach(c => walk(c, [...path, node.task], group));
+  };
+  buildTree(sorted).forEach(root => {
+    const group = { root, items: [] };
+    walk(root, [], group);
+    if (group.items.length) groups.push(group);
+  });
+  return groups;
+}
+// 此節點本身與所有後代皆已完成
+function isDoneDeep(node) {
+  return node.status === '已完成' && node.children.every(isDoneDeep);
+}
+
+function renderPending() {
+  const assignee = document.getElementById('pending-assignee').value;
+  const groups = collectPending(assignee);
+  const total = groups.reduce((n, g) => n + g.items.length, 0);
+  document.getElementById('pending-count').textContent = `（共 ${total} 項）`;
+  const today = new Date().toISOString().slice(0, 10);
+  const box = document.getElementById('pending-list');
+  if (!total) { box.innerHTML = '<div class="empty-state">沒有未完成的工作 🎉</div>'; return; }
+  box.innerHTML = groups.map(g => `
+    <div class="pending-group">
+      <div class="pending-group-title">${esc(g.root.task)}</div>
+      ${g.items.map(({ node, path }) => {
+        const overdue = node.dueDate && node.dueDate < today;
+        return `<div class="pending-item">
+          <div class="pending-main">
+            ${path.length > 1 ? `<div class="pending-path">${esc(path.slice(1).join(' › '))}</div>` : ''}
+            <div class="pending-title">${esc(node.task)}</div>
+            <div class="pending-meta">
+              ${priorityBadge(node.priority)}
+              ${node.assignedTo ? `<span>負責人: ${esc(node.assignedTo)}</span>` : ''}
+              ${node.dueDate ? `<span class="${overdue ? 'pending-overdue' : ''}">截止: ${esc(node.dueDate)}${overdue ? '（逾期）' : ''}</span>` : ''}
+            </div>
+          </div>
+          <button class="btn btn-sm btn-secondary pending-edit" data-id="${esc(node.id)}">編輯</button>
+        </div>`;
+      }).join('')}
+    </div>`).join('');
+  box.querySelectorAll('.pending-edit').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const todo = allTodos.find(t => t.id === btn.dataset.id);
+      if (!todo) return;
+      closePending();
+      openModal(todo, null);
+    });
+  });
+}
+
+function openPending() {
+  const sel = document.getElementById('pending-assignee');
+  const cur = sel.value;
+  sel.innerHTML = '<option value="">全部</option>' +
+    allUsers.map(u => `<option value="${esc(u)}">${esc(u)}</option>`).join('');
+  sel.value = cur;
+  renderPending();
+  document.getElementById('pending-modal').classList.remove('hidden');
+}
+function closePending() { document.getElementById('pending-modal').classList.add('hidden'); }
+
+document.getElementById('btn-pending').addEventListener('click', openPending);
+document.getElementById('pending-close').addEventListener('click', closePending);
+document.getElementById('pending-backdrop').addEventListener('click', closePending);
+document.getElementById('pending-assignee').addEventListener('change', renderPending);
 
 // Search
 document.getElementById('btn-search').addEventListener('click', doSearch);

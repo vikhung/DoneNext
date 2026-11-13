@@ -336,6 +336,21 @@ header h1 { font-size: 1.25rem; font-weight: 600; display: flex; align-items: ce
   border-bottom: 1px solid #e2e8f0;
 }
 
+/* Pending list modal */
+.pending-content { max-width: 760px; }
+.pending-count { font-size: .85rem; font-weight: 400; color: #64748b; }
+.pending-filter { display: flex; align-items: center; gap: 8px; margin-bottom: 14px; font-size: .85rem; flex-wrap: wrap; }
+.pending-hint { color: #94a3b8; font-size: .78rem; }
+.pending-group { margin-bottom: 14px; }
+.pending-group-title { font-weight: 600; font-size: .9rem; color: #0f172a; padding: 4px 0; border-bottom: 1px solid #e2e8f0; margin-bottom: 6px; }
+.pending-item { display: flex; align-items: center; gap: 10px; padding: 7px 8px; border-radius: 6px; }
+.pending-item:hover { background: #f1f5f9; }
+.pending-item .pending-main { flex: 1; min-width: 0; }
+.pending-path { font-size: .75rem; color: #94a3b8; }
+.pending-title { font-size: .9rem; color: #1e293b; }
+.pending-meta { font-size: .75rem; color: #64748b; margin-top: 2px; display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+.pending-overdue { color: #dc2626; font-weight: 600; }
+
 /* Modal form groups */
 .form-group { margin-bottom: 14px; }
 .form-group label {
