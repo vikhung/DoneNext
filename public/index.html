@@ -16,6 +16,7 @@
 <nav class="top-tabs">
   <button class="top-tab-btn active" data-top="todo">任務管理</button>
   <button class="top-tab-btn" data-top="toolkit">常用工具</button>
+  <button class="top-tab-btn" data-top="apitest">API TEST</button>
   <button class="top-tab-btn" data-top="changelog">異動說明</button>
 </nav>
 
@@ -289,12 +290,162 @@
   </div>
   </div>
 
+  <!-- API TEST -->
+  <div id="top-apitest" class="top-section">
+    <div class="at-layout">
+
+      <aside class="at-sidebar">
+        <div class="at-sidebar-title">API 類別</div>
+        <div class="at-add-col">
+          <input type="text" id="at-new-col-name" placeholder="類別名稱（即檔名）" maxlength="50">
+          <button class="btn btn-primary btn-sm" id="at-btn-add-col">新增</button>
+        </div>
+        <div id="at-tree"></div>
+      </aside>
+
+      <section class="at-main">
+        <div id="at-empty" class="empty-state">請先在左側新增類別，再按「+ API」建立一支 API</div>
+
+        <div id="at-editor" class="at-editor at-hidden">
+          <div class="at-editor-path" id="at-editor-path"></div>
+
+          <div class="at-field">
+            <label for="at-name">API 名稱</label>
+            <input type="text" id="at-name" maxlength="100" placeholder="例如：建立訂單">
+          </div>
+
+          <div class="at-field">
+            <label for="at-url">Method / URL</label>
+            <div class="at-url-row">
+              <select id="at-method">
+                <option>GET</option>
+                <option>POST</option>
+                <option>PUT</option>
+                <option>PATCH</option>
+                <option>DELETE</option>
+                <option>HEAD</option>
+                <option>OPTIONS</option>
+              </select>
+              <input type="text" id="at-url" spellcheck="false" placeholder="https://host/path?no=${N(7)}">
+            </div>
+          </div>
+
+          <div class="at-field">
+            <label for="at-headers">HTTP Header（每行一組 <code>Key: Value</code>，# 開頭為註解）</label>
+            <textarea id="at-headers" rows="4" spellcheck="false" placeholder="Content-Type: application/json&#10;X-Trace-Id: ${AN(10)}"></textarea>
+          </div>
+
+          <div class="at-field">
+            <label for="at-body">HTTP Body</label>
+            <textarea id="at-body" rows="7" spellcheck="false" placeholder='{"orderNo":"${N(7)}","time":"${DATETIME(yyyyMMddhhmmss)}"}'></textarea>
+          </div>
+
+          <div class="at-hint">
+            可用變數（URL / Header / Body 皆適用，每次發送重新產生）：
+            <code>${N(7)}</code> 7 個隨機數字、
+            <code>${AN(10)}</code> 10 個隨機英數字（0-9、A-Z）、
+            <code>${DATETIME(yyyyMMddhhmmss)}</code> 目前日期時間（24 小時制；可用 yyyy MM dd hh mm ss SSS）
+          </div>
+
+          <div class="at-run-row">
+            <div class="at-field">
+              <label for="at-count">發送次數</label>
+              <input type="number" id="at-count" min="1" max="1000" step="1" value="1">
+            </div>
+            <div class="at-field">
+              <label for="at-concurrency">併發人數</label>
+              <input type="number" id="at-concurrency" min="1" max="50" step="1" value="1">
+            </div>
+            <div class="at-field">
+              <label for="at-interval">間隔（秒）</label>
+              <input type="number" id="at-interval" min="0" max="3600" step="0.1" value="0">
+            </div>
+            <div class="at-field">
+              <label for="at-timeout">逾時（秒）</label>
+              <input type="number" id="at-timeout" min="1" max="300" step="1" value="30">
+            </div>
+            <label class="at-check"><input type="checkbox" id="at-insecure"> 忽略憑證錯誤</label>
+          </div>
+          <div class="at-plan" id="at-plan"></div>
+
+          <div id="at-msg" class="tool-error hidden"></div>
+
+          <div class="tool-actions">
+            <button class="btn btn-secondary" id="at-btn-save">儲存</button>
+            <button class="btn btn-primary" id="at-btn-send">▶ 發送</button>
+            <button class="btn btn-danger" id="at-btn-stop" disabled>■ 停止</button>
+            <button class="btn btn-secondary" id="at-btn-clear">清除結果</button>
+            <span class="at-saved at-hidden" id="at-saved">已儲存</span>
+          </div>
+        </div>
+
+      </section>
+
+      <section class="at-result-col">
+        <div class="at-result-title">執行結果</div>
+        <div class="at-summary" id="at-summary"></div>
+        <div id="at-results"></div>
+      </section>
+
+    </div>
+  </div>
+
   <div id="top-changelog" class="top-section">
     <div class="changelog-page">
 
       <div class="version-block">
         <div class="version-header">
-          <span class="version-badge">V0.4</span>
+          <span class="version-badge">V0.5</span>
+          <span class="version-date">2026-11-13</span>
+          <span class="version-label">新增 API 測試工具</span>
+        </div>
+        <div class="changelog-list">
+          <div class="changelog-item">
+            <span class="changelog-tag tag-new">新功能</span>
+            <span>新增頂層頁籤「API TEST」：API 測試工具，可批次、併發發送請求並逐筆檢視結果，與「任務管理」「常用工具」並列</span>
+          </div>
+          <div class="changelog-item">
+            <span class="changelog-tag tag-new">新功能</span>
+            <span><strong>API 設定</strong>：可設定 API 名稱、Method（GET／POST／PUT／PATCH／DELETE／HEAD／OPTIONS）、URL、HTTP Header（每行一組 Key: Value）與 HTTP Body</span>
+          </div>
+          <div class="changelog-item">
+            <span class="changelog-tag tag-new">新功能</span>
+            <span><strong>類別管理</strong>：API 依類別分組，一個類別可包含多支 API，存放於資料目錄（data/apitest/類別名稱.json）；類別可新增、改名（✎）與刪除</span>
+          </div>
+          <div class="changelog-item">
+            <span class="changelog-tag tag-new">新功能</span>
+            <span><strong>批次與併發發送</strong>：可設定發送次數、併發人數與每次間隔秒數，例如 10 筆由 2 人併發，即兩人同時起跑、各發 5 次，每次間隔 5 秒；執行中可隨時按「停止」</span>
+          </div>
+          <div class="changelog-item">
+            <span class="changelog-tag tag-new">新功能</span>
+            <span><strong>指令化變數</strong>：URL、Header、Body 皆可使用，每筆發送各自重新產生 — ${N(7)} 隨機 7 個數字、${AN(10)} 隨機 10 個英數字（0-9、A-Z）、${DATETIME(yyyyMMddhhmmss)} 目前日期時間（24 小時制）</span>
+          </div>
+          <div class="changelog-item">
+            <span class="changelog-tag tag-new">新功能</span>
+            <span><strong>逐筆結果</strong>：每筆顯示序號、使用者、狀態碼與回應時間，展開可檢視 Request Header／Body 與 Response Header／Body；依狀態碼著色（2xx 綠、3xx 藍、4xx 黃、5xx 紅，連線失敗或逾時為深灰）</span>
+          </div>
+          <div class="changelog-item">
+            <span class="changelog-tag tag-new">新功能</span>
+            <span><strong>執行總結</strong>：每次執行結束後顯示發送筆數、執行區間（起訖時間與歷時）、平均／最大／最小回應秒數、成功（200）與失敗（非 200）筆數及狀態碼分布</span>
+          </div>
+          <div class="changelog-item">
+            <span class="changelog-tag tag-new">新功能</span>
+            <span><strong>結果保留</strong>：重複發送不會清除先前結果，各次執行以標題列區隔，方便前後比較；需清空時按「清除結果」</span>
+          </div>
+          <div class="changelog-item">
+            <span class="changelog-tag tag-new">新功能</span>
+            <span><strong>寬螢幕三欄版面</strong>：左側 API 類別、中間請求設定、右側執行結果；結果固定於右側區塊內捲動，數百筆也不會拉長頁面</span>
+          </div>
+          <div class="changelog-item">
+            <span class="changelog-tag tag-new">新功能</span>
+            <span><strong>伺服器代發</strong>：請求由本站伺服器主機發出，不受瀏覽器跨網域（CORS）限制，可完整呈現 Header；另可設定逾時秒數與忽略憑證錯誤（測試自簽憑證的內部 API）</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="version-block">
+        <div class="version-header">
+          <span class="version-badge version-badge-old">V0.4</span>
           <span class="version-date">2026-11-13</span>
           <span class="version-label">待辦清單</span>
         </div>
@@ -538,5 +689,6 @@
 
 <script src="app.js"></script>
 <script src="toolkit.js"></script>
+<script src="apitest.js"></script>
 </body>
 </html>
